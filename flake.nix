@@ -21,5 +21,20 @@
             ) scripts
           );
       };
+
+      devShells = nixpkgs.lib.genAttrs [ "x86_64-linux" ] (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          scripts = self.lib.mkScripts pkgs (rec {
+            test = "echo hello world";
+          });
+        in
+        {
+          default = pkgs.mkShell {
+            packages = scripts;
+          };
+        }
+      );
     };
 }
