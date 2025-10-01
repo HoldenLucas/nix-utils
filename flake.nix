@@ -10,9 +10,9 @@
           builtins.attrValues (
             builtins.mapAttrs (
               name: content:
-              # NOTE `set -x` echos the command before its output
-              #      `,` prefix for ergonomic tab completion
-              #      `\` suffix allows combining with other scripts
+              # NOTE `set -x` show the commands
+              #      `,` prefix = better tab completion
+              #      `\` suffix = optionally extend options :^)
               pkgs.writeShellScriptBin ",${name}" ''
                 set -x
                 ${content} \
@@ -25,18 +25,36 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          # NOTE use it like this
           scripts = self.lib.mkScripts pkgs (rec {
-            test-hello = "echo this is a test";
-            test-extend = "${test-hello}!! Wow!";
+            test-hello = "echo hello";
+            test-compare = ''
+              # NOTE these both work, first one is better!
+              ${test-hello}
+              ,test-hello
+            '';
+            test-extend = "${test-hello} hi hello!! wow!";
             test-multiline = ''
               echo hello
               echo world
             '';
+            test-oneshot = ''
+              ${pkgs.lib.getExe pkgs.neofetch}
+            '';
+            date = "date";
+            test-extend-options = ''
+              # NOTE call it like this...
+              ${date}
+              # NOTE or extend! useful!
+              ${date} \
+              --iso
+            '';
             test = ''
-              ,test-hello
-              ,test-extend
-              ,test-multiline
+              ${test-hello}
+              ${test-compare}
+              ${test-extend}
+              ${test-multiline}
+              ${test-oneshot}
+              ${test-extend-options}
             '';
           });
         in
