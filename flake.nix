@@ -25,8 +25,19 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # NOTE use it like this
           scripts = self.lib.mkScripts pkgs (rec {
-            test = "echo hello world";
+            test-hello = "echo this is a test";
+            test-extend = "${test-hello}!! Wow!";
+            test-multiline = ''
+              echo hello
+              echo world
+            '';
+            test = ''
+              ,test-hello
+              ,test-extend
+              ,test-multiline
+            '';
           });
         in
         {
