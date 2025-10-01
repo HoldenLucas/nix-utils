@@ -2,21 +2,20 @@
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
-    { nixpkgs, ... }:
+    { nixpkgs, self, ... }:
     {
       lib = {
         mkScripts =
-          pkgs: scriptsAttr:
-          let
-            scriptNames = builtins.attrNames scriptsAttr;
-            scripts = scriptsAttr;
-          in
+          pkgs: scripts:
           builtins.attrValues (
             builtins.mapAttrs (
               name: content:
+              # NOTE `set -x` echos the command before its output
+              #      `,` prefix for ergonomic tab completion
+              #      `\` suffix allows combining with other scripts
               pkgs.writeShellScriptBin ",${name}" ''
                 set -x
-                ${content}
+                ${content} \
               ''
             ) scripts
           );
